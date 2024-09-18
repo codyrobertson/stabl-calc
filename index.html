@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Guard Registration Cost Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-['Poppins']">
+    <div class="container mx-auto p-4 md:p-6 space-y-6 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-800 mb-2">Security Guard Registration Cost Calculator</h1>
+            <p class="text-gray-600">Optimize your security operations and reduce costs</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+                <div class="space-y-2">
+                    <label for="headcount" class="block text-sm font-medium text-gray-700">Number of Guards</label>
+                    <input id="headcount" type="number" value="200" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="turnoverRate" class="block text-sm font-medium text-gray-700">Turnover Rate (%)</label>
+                    <input id="turnoverRate" type="number" value="100" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="registrationCost" class="block text-sm font-medium text-gray-700">Cost per Registration ($)</label>
+                    <input id="registrationCost" type="number" value="1200" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 rounded-lg p-4 mb-6">
+                <h2 class="text-xl font-semibold text-indigo-800 mb-3">Current Costs</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-lg p-3 shadow">
+                        <p class="text-sm text-gray-500">Yearly</p>
+                        <p id="yearlyCost" class="text-2xl font-bold text-indigo-600"></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-3 shadow">
+                        <p class="text-sm text-gray-500">Monthly</p>
+                        <p id="monthlyCost" class="text-2xl font-bold text-indigo-600"></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-3 shadow">
+                        <p class="text-sm text-gray-500">Weekly</p>
+                        <p id="weeklyCost" class="text-2xl font-bold text-indigo-600"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-indigo-800 mb-3">Registration Costs by Turnover Rate</h2>
+                <div class="w-full h-64 md:h-80">
+                    <canvas id="costChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-green-50 rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-green-800 mb-4">Potential Improvements</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-green-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-chart-line text-green-500 mr-2"></i>
+                            <h3 class="font-semibold text-lg">5% Reduction</h3>
+                        </div>
+                        <p id="improvement5" class="text-green-700"></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-green-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-chart-bar text-green-500 mr-2"></i>
+                            <h3 class="font-semibold text-lg">10% Reduction</h3>
+                        </div>
+                        <p id="improvement10" class="text-green-700"></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-green-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-rocket text-green-500 mr-2"></i>
+                            <h3 class="font-semibold text-lg">15% Reduction</h3>
+                        </div>
+                        <p id="improvement15" class="text-green-700"></p>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <a href="#" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full inline-flex items-center transition duration-300">
+                        <i class="fas fa-phone-alt mr-2"></i>
+                        Contact Us to Reduce Costs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const headcountInput = document.getElementById('headcount');
+            const turnoverRateInput = document.getElementById('turnoverRate');
+            const registrationCostInput = document.getElementById('registrationCost');
+            const yearlyCostEl = document.getElementById('yearlyCost');
+            const monthlyCostEl = document.getElementById('monthlyCost');
+            const weeklyCostEl = document.getElementById('weeklyCost');
+            const improvement5El = document.getElementById('improvement5');
+            const improvement10El = document.getElementById('improvement10');
+            const improvement15El = document.getElementById('improvement15');
+
+            let chart;
+
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+            }
+
+            function calculatePercentImprovement(newValue, oldValue) {
+                return ((oldValue - newValue) / oldValue * 100).toFixed(2);
+            }
+
+            function updateCalculations() {
+                const headcount = Number(headcountInput.value);
+                const turnoverRate = Number(turnoverRateInput.value);
+                const registrationCost = Number(registrationCostInput.value);
+
+                const yearlyCost = headcount * turnoverRate / 100 * registrationCost;
+                const monthlyCost = yearlyCost / 12;
+                const weeklyCost = yearlyCost / 52;
+
+                yearlyCostEl.textContent = formatCurrency(yearlyCost);
+                monthlyCostEl.textContent = formatCurrency(monthlyCost);
+                weeklyCostEl.textContent = formatCurrency(weeklyCost);
+
+                improvement5El.textContent = `Save ${formatCurrency(yearlyCost * 0.05)} annually`;
+                improvement10El.textContent = `Save ${formatCurrency(yearlyCost * 0.10)} annually`;
+                improvement15El.textContent = `Save ${formatCurrency(yearlyCost * 0.15)} annually`;
+
+                updateChart();
+            }
+
+            function updateChart() {
+                const headcount = Number(headcountInput.value);
+                const turnoverRate = Number(turnoverRateInput.value);
+                const registrationCost = Number(registrationCostInput.value);
+
+                const chartData = [10, 15, 20, 25, 30, 35, 40].map(rate => ({
+                    rate: `${rate}%`,
+                    yearly: (headcount * turnoverRate / 100 * registrationCost * rate / 100).toFixed(2),
+                    monthly: (headcount * turnoverRate / 100 * registrationCost * rate / 100 / 12).toFixed(2),
+                    weekly: (headcount * turnoverRate / 100 * registrationCost * rate / 100 / 52).toFixed(2),
+                }));
+
+                if (chart) {
+                    chart.destroy();
+                }
+
+                const ctx = document.getElementById('costChart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.map(d => d.rate),
+                        datasets: [
+                            {
+                                label: 'Yearly',
+                                data: chartData.map(d => d.yearly),
+                                borderColor: '#4f46e5',
+                                backgroundColor: '#4f46e5',
+                                fill: false
+                            },
+                            {
+                                label: 'Monthly',
+                                data: chartData.map(d => d.monthly),
+                                borderColor: '#06b6d4',
+                                backgroundColor: '#06b6d4',
+                                fill: false
+                            },
+                            {
+                                label: 'Weekly',
+                                data: chartData.map(d => d.weekly),
+                                borderColor: '#22c55e',
+                                backgroundColor: '#22c55e',
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += formatCurrency(context.parsed.y);
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            headcountInput.addEventListener('input', updateCalculations);
+            turnoverRateInput.addEventListener('input', updateCalculations);
+            registrationCostInput.addEventListener('input', updateCalculations);
+
+            updateCalculations();
+        });
+    </script>
+</body>
+</html>
